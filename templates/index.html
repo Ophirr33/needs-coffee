@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div id="index-welcome">
+        <h2>Welcome!</h2>
+        <p>This is just a website I put together in my free time.
+           It serves as half personal website and half coffee-fueled musings.</p>
+    </div>
+    <div id="blog-previews">
+        {% for blog in blogs %}
+            <div class="blog-preview-card">
+                <a href="{{blog.link_text}}">
+                    <img alt="{{blog.title}} preview image"
+                         src="/image-previews/{{blog.link_text}}">
+                    <h3>{{blog.title}}</h3>
+                    <small>{{blog.created}}</small>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

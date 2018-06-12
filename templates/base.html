@@ -1,0 +1,23 @@
+<!DOCTYPE html5>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta lang="en">
+        <meta name="author" content="Ty Coghlan">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,">
+        <meta name="desecription" content="{{description}}">
+        <title>{% block title %}{% endblock %} - ☕</title>
+        <link href="styles.css" rel="stylesheet">
+    </head>
+    <body>
+        <div id="content">
+            <div id="header">
+                <a href="https://github.com/ophirr33">GitHub</a>
+                <a href="https://linkedin.com/in/ty-coghlan">LinkedIn</a>
+            </div>
+            <div id="body">
+                {% block content %}{% endblock %}
+            </div>
+        <div>
+    </body>
+</html>

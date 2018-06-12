@@ -1,0 +1,4 @@
+index should be a carded view of blogs
+about page can be a little blurb about me
+anything else will basically try to load a blog
+simple header at the top of every page.
