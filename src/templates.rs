@@ -3,21 +3,21 @@ use super::*;
 
 #[derive(Debug, Template)]
 #[template(path = "base.html")]
-pub struct BaseTemplate<'a> {
-    title: &'a str,
-    description: &'a str,
+pub struct BaseTemplate {
+    title: String,
+    description: String,
 }
 
-impl<'a> BaseTemplate<'a> {
-    fn new(title: &'a str, description: &'a str) -> Self  {
-        BaseTemplate { title, description }
+impl BaseTemplate {
+    fn new<S1: ToString, S2: ToString>(title: S1, description: S2) -> Self  {
+        BaseTemplate { title: title.to_string(), description: description.to_string() }
     }
 }
 
 #[derive(Debug, Template)]
 #[template(path = "index.html")]
 pub struct IndexTemplate<'a> {
-    _parent: BaseTemplate<'a>,
+    _parent: BaseTemplate,
     blogs: &'a[Blog],
 }
 
@@ -34,27 +34,45 @@ impl<'a> IndexTemplate<'a> {
 #[derive(Debug, Template)]
 #[template(path = "blog.html", escape = "none")]
 pub struct BlogTemplate<'a> {
-    _parent: BaseTemplate<'a>,
+    _parent: BaseTemplate,
     blog: &'a Blog,
 }
 
 impl<'a> BlogTemplate<'a> {
     pub fn new(blog: &'a Blog) -> Self {
-        let description = "Will make this an actual descriptioin eventually";
+        let description = "Will make this an actual description eventually";
         BlogTemplate {
-            _parent: BaseTemplate::new(&blog.title, description),
+            _parent: BaseTemplate::new(blog.title(), description),
             blog,
         }
     }
 }
 
 #[derive(Debug, Template)]
-#[template(path = "about.html")]
-pub struct AboutTemplate<'a> {
-    _parent: BaseTemplate<'a>
+#[template(path = "gallery.html")]
+pub struct GalleryTemplate<'a> {
+    _parent: BaseTemplate,
+    photos: &'a[Photo],
 }
 
-impl<'a> AboutTemplate<'a> {
+
+impl<'a> GalleryTemplate<'a> {
+    pub fn new(photos: &'a[Photo]) -> Self {
+        let description = "Just my amateur photos";
+        GalleryTemplate {
+            _parent: BaseTemplate::new("Ty's Photography", description),
+            photos,
+        }
+    }
+}
+
+#[derive(Debug, Template)]
+#[template(path = "about.html")]
+pub struct AboutTemplate {
+    _parent: BaseTemplate
+}
+
+impl AboutTemplate {
     pub fn new() -> Self {
         let description = "Ty's bio, relevant links, and coffee preferences.";
         AboutTemplate {
@@ -65,11 +83,11 @@ impl<'a> AboutTemplate<'a> {
 
 #[derive(Debug, Template)]
 #[template(path = "404.html")]
-pub struct NotFoundTemplate<'a> {
-    _parent: BaseTemplate<'a>
+pub struct NotFoundTemplate {
+    _parent: BaseTemplate
 }
 
-impl<'a> NotFoundTemplate<'a> {
+impl NotFoundTemplate {
     pub fn new() -> Self {
         let description = "404 not found";
         NotFoundTemplate {

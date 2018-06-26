@@ -8,14 +8,10 @@
     </div>
     <div id="blog-previews">
         {% for blog in blogs %}
-            <div class="blog-preview-card">
-                <a href="{{blog.link_text}}">
-                    <img alt="{{blog.title}} preview image"
-                         src="/image-previews/{{blog.link_text}}">
-                    <h3>{{blog.title}}</h3>
-                    <small>{{blog.created}}</small>
-                </a>
-            </div>
+        <div class="blog-preview-card">
+            <h3><a href="{{blog.blog_link()}}"><h3>{{blog.title()}}</a></h3>
+            <small>{{blog.created}}</small>
+        </div>
         {% endfor %}
     </div>
 {% endblock %}
