@@ -1,10 +1,4 @@
-extern crate clap;
-extern crate toml;
-extern crate askama;
-extern crate html5ever_ext;
-extern crate image;
-extern crate log;
-
+use super::{clap, toml, askama, html5ever_ext, image, simplelog};
 use std::fmt::{self};
 use std::io;
 
@@ -42,4 +36,6 @@ opaque_error!(toml::ser::Error);
 opaque_error!(askama::Error);
 opaque_error!(html5ever_ext::HtmlError);
 opaque_error!(image::ImageError);
-opaque_error!(log::SetLoggerError);
+opaque_error!(simplelog::TermLogError);
+
+pub type OResult<T> = Result<T, OpaqueError>;

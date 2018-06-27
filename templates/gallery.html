@@ -3,8 +3,8 @@
 {% block content %}
     <h1>Eventually, photos will go here</h1>
     <div id="photo-gallery">
-        {% for photo in photos %}
-            <img width=320 height=180 src="{{photo.preview_link()}}">
+        {% for link in preview_links %}
+            <img width=320 height=180 src="{{link}}">
         {% endfor %}
     </div>
 {% endblock %}

@@ -15,7 +15,7 @@ pulldown-cmark = { version = "0.1.2", default-features = false }
 sass-rs = "0.2"
 serde = "1"
 serde_derive = "1"
-simple_logger = "0.5"
+simplelog = "0.5"
 toml = "0.4"
 
 [build-dependencies]

@@ -1,5 +1,4 @@
 use askama::Template;
-use super::*;
 
 #[derive(Debug, Template)]
 #[template(path = "base.html")]
@@ -11,6 +10,19 @@ pub struct BaseTemplate {
 impl BaseTemplate {
     fn new<S1: ToString, S2: ToString>(title: S1, description: S2) -> Self  {
         BaseTemplate { title: title.to_string(), description: description.to_string() }
+    }
+}
+
+#[derive(Debug)]
+pub struct Blog {
+    link: String,
+    title: String,
+    created: String,
+}
+
+impl Blog {
+    pub fn new(link: String, title: String, created: String) -> Self {
+        Blog { link, title, created }
     }
 }
 
@@ -35,15 +47,15 @@ impl<'a> IndexTemplate<'a> {
 #[template(path = "blog.html", escape = "none")]
 pub struct BlogTemplate<'a> {
     _parent: BaseTemplate,
-    blog: &'a Blog,
+    blog_html: &'a str,
 }
 
 impl<'a> BlogTemplate<'a> {
-    pub fn new(blog: &'a Blog) -> Self {
+    pub fn new(blog_html: &'a str, blog: Blog) -> Self {
         let description = "Will make this an actual description eventually";
         BlogTemplate {
-            _parent: BaseTemplate::new(blog.title(), description),
-            blog,
+            _parent: BaseTemplate::new(blog.title, description),
+            blog_html,
         }
     }
 }
@@ -52,16 +64,16 @@ impl<'a> BlogTemplate<'a> {
 #[template(path = "gallery.html")]
 pub struct GalleryTemplate<'a> {
     _parent: BaseTemplate,
-    photos: &'a[Photo],
+    preview_links: &'a[String],
 }
 
 
 impl<'a> GalleryTemplate<'a> {
-    pub fn new(photos: &'a[Photo]) -> Self {
+    pub fn new(preview_links: &'a[String]) -> Self {
         let description = "Just my amateur photos";
         GalleryTemplate {
             _parent: BaseTemplate::new("Ty's Photography", description),
-            photos,
+            preview_links,
         }
     }
 }
@@ -95,3 +107,5 @@ impl NotFoundTemplate {
         }
     }
 }
+
+

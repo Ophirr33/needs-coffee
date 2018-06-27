@@ -1,9 +1,10 @@
-use errors::OpaqueError;
+use errors::OResult;
 use std::io::{ BufReader, BufWriter, Read, Write };
 use std::path::Path;
 use std::fs::{ self, File };
+use html5ever_ext::{RcDom, RcDomExt, Minify};
 
-pub fn read_file<P: AsRef<Path>>(path: P) -> Result<String, OpaqueError> {
+pub fn read_file<P: AsRef<Path>>(path: P) -> OResult<String> {
     let path = path.as_ref();
     let mut br = BufReader::new(File::open(path)?);
     let mut result = String::new();
@@ -11,15 +12,16 @@ pub fn read_file<P: AsRef<Path>>(path: P) -> Result<String, OpaqueError> {
     Ok(result)
 }
 
-pub fn read_file_raw<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, OpaqueError> {
-    let path = path.as_ref();
-    let mut br = BufReader::new(File::open(path)?);
-    let mut result = Vec::new();
-    br.read_to_end(&mut result)?;
-    Ok(result)
+pub fn write_minified_html<P, B>(path: P, content: B) -> OResult<()>
+    where P: AsRef<Path>,
+          B: AsRef<[u8]>
+{
+    let dom = RcDom::from_bytes(content.as_ref());
+    dom.minify_to_file_path(false, path)?;
+    Ok(())
 }
 
-pub fn write_file<P, B>(path: P, content: B) -> Result<(), OpaqueError>
+pub fn write_file<P, B>(path: P, content: B) -> OResult<()>
     where P: AsRef<Path>,
           B: AsRef<[u8]>
 {
