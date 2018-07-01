@@ -1,6 +1,7 @@
 use super::{clap, toml, askama, html5ever_ext, image, simplelog};
 use std::fmt::{self};
 use std::io;
+use notify;
 
 #[derive(Debug)]
 pub struct OpaqueError {
@@ -37,5 +38,6 @@ opaque_error!(askama::Error);
 opaque_error!(html5ever_ext::HtmlError);
 opaque_error!(image::ImageError);
 opaque_error!(simplelog::TermLogError);
+opaque_error!(notify::Error);
 
 pub type OResult<T> = Result<T, OpaqueError>;

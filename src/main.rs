@@ -7,8 +7,10 @@ extern crate image;
 extern crate inflector;
 #[macro_use]
 extern crate log;
+extern crate notify;
 extern crate simplelog;
 extern crate pulldown_cmark;
+extern crate rayon;
 extern crate sass_rs;
 #[macro_use]
 extern crate serde_derive;
@@ -19,12 +21,14 @@ mod errors;
 mod config;
 mod templates;
 mod resource;
+mod serve;
 
 use clap::{App, Arg, SubCommand};
 use config::*;
 use errors::*;
 use resource::SiteResources;
 use std::path::{Path, PathBuf};
+use std::fs;
 
 /* TODO: Add build and serve functions, () -> Result<(), OpaqueError>, and call them in the
  *       subcomand matches
@@ -42,26 +46,25 @@ use std::path::{Path, PathBuf};
  */
 
 fn main() -> Result<(), OpaqueError> {
-    askama::rerun_if_templates_changed();
-    simplelog::TermLogger::init(simplelog::LevelFilter::Debug,
+    simplelog::TermLogger::init(simplelog::LevelFilter::Info,
                                 simplelog::Config::default())?;
+    let arg_build    = "BUILD_DIR";
+    let arg_cache    = "NO_CACHE";
+    let arg_clean    = "CLEAN";
+    let arg_listen   = "LISTEN_ADDR";
     let arg_metadata = "METADATA_FILE";
     let arg_static   = "STATIC_DIR";
-    let arg_build    = "BUILD_DIR";
-    let arg_listen   = "LISTEN_ADDR";
     let mut app =
         App::new("static-site-generator")
             .version("1.0")
             .author("Ty Coghlan <coghlan.ty@gmail.com>")
             .about("Incredibly simple site generator")
             .arg(Arg::with_name(arg_static)
-                     .short("s")
                      .long("static")
                      .help("The static site directory")
                      .takes_value(true)
                      .global(true))
             .arg(Arg::with_name(arg_metadata)
-                     .short("m")
                      .long("metadata")
                      .help("The location of the metadata file (stores time info)")
                      .takes_value(true)
@@ -71,7 +74,15 @@ fn main() -> Result<(), OpaqueError> {
                             .arg(Arg::with_name(arg_build)
                                      .index(1)
                                      .help("The output directory")
-                                     .takes_value(true)))
+                                     .takes_value(true))
+                            .arg(Arg::with_name(arg_clean)
+                                     .long("clean")
+                                     .help("removes the build directory")
+                                     .takes_value(false))
+                            .arg(Arg::with_name(arg_cache)
+                                     .long("no-cache")
+                                     .help("rebuilds all files regardless of timing")
+                                     .takes_value(false)))
             .subcommand(SubCommand::with_name("serve")
                             .about("Just serves a hot reload server")
                             .arg(Arg::with_name(arg_listen)
@@ -98,20 +109,23 @@ fn main() -> Result<(), OpaqueError> {
 
     let config = Config::from_file(&metadata_file).unwrap_or(Config::default());
     let resources = SiteResources::read_resources(&static_dir, &config)?;
-    let updated_config = Config::new(resources.timings());
-    updated_config.to_file(&metadata_file)?;
-
-    if config != updated_config {
-        updated_config.to_file(&metadata_file)?;
-    }
 
     match matches.subcommand() {
         ("build", Some(build_matches)) => {
             let build_dir = Path::new(build_matches.value_of(arg_build).unwrap_or("build"));
-            resources.write_resources(build_dir)
+            if build_matches.is_present(arg_clean) {
+                warn!("Cleaning build_dir {:?}", build_dir);
+                fs::remove_dir_all(build_dir)?;
+            }
+            resources.build_all(build_dir, build_matches.is_present(arg_cache))?;
+            let updated_config = Config::new(resources.timings());
+            if config != updated_config {
+                updated_config.to_file(&metadata_file)?;
+            }
+            Ok(())
         },
-        ("serve", Some(serve_matches)) => {
-            let _listen = serve_matches.value_of(arg_listen).unwrap_or("127.0.0.1:5867");
+        ("serve", Some(_serve_matches)) => {
+            // let _listen = serve_matches.value_of(arg_listen).unwrap_or("127.0.0.1:5867");
             Ok(())
         },
         _ => unreachable!()
