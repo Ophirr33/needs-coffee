@@ -27,6 +27,7 @@ use clap::{App, Arg, SubCommand};
 use config::*;
 use errors::*;
 use resource::SiteResources;
+use serve::serve;
 use std::path::{Path, PathBuf};
 use std::fs;
 
@@ -69,12 +70,12 @@ fn main() -> Result<(), OpaqueError> {
                      .help("The location of the metadata file (stores time info)")
                      .takes_value(true)
                      .global(true))
+            .arg(Arg::with_name(arg_build)
+                     .index(1)
+                     .help("The output directory")
+                     .takes_value(true))
             .subcommand(SubCommand::with_name("build")
                             .about("Builds published site files")
-                            .arg(Arg::with_name(arg_build)
-                                     .index(1)
-                                     .help("The output directory")
-                                     .takes_value(true))
                             .arg(Arg::with_name(arg_clean)
                                      .long("clean")
                                      .help("removes the build directory")
@@ -102,6 +103,7 @@ fn main() -> Result<(), OpaqueError> {
     };
 
     let static_dir = Path::new(matches.value_of(arg_static).unwrap_or("static"));
+    let build_dir = Path::new(matches.value_of(arg_build).unwrap_or("build"));
 
     let metadata_file = matches.value_of(arg_metadata)
         .map(|s| PathBuf::from(s))
@@ -112,7 +114,6 @@ fn main() -> Result<(), OpaqueError> {
 
     match matches.subcommand() {
         ("build", Some(build_matches)) => {
-            let build_dir = Path::new(build_matches.value_of(arg_build).unwrap_or("build"));
             if build_matches.is_present(arg_clean) {
                 warn!("Cleaning build_dir {:?}", build_dir);
                 fs::remove_dir_all(build_dir)?;
@@ -125,8 +126,7 @@ fn main() -> Result<(), OpaqueError> {
             Ok(())
         },
         ("serve", Some(_serve_matches)) => {
-            // let _listen = serve_matches.value_of(arg_listen).unwrap_or("127.0.0.1:5867");
-            Ok(())
+            serve(&config, &build_dir, &static_dir)
         },
         _ => unreachable!()
     }
