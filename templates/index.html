@@ -5,13 +5,13 @@
         <h2>Welcome!</h2>
         <p>This is just a website I put together in my free time.
            It serves as half personal website and half coffee-fueled musings.</p>
-    </div>
-    <div id="blog-previews">
-        {% for blog in blogs %}
-        <div class="blog-preview-card">
-            <h3><a href="{{blog.link}}"><h3>{{blog.title}}</a></h3>
-            <small>{{blog.created}}</small>
+        <div id="blog-previews">
+            {% for blog in blogs %}
+            <div class="blog-preview-card">
+                <h3><a href="{{blog.link}}"><h3>{{blog.title}}</a></h3>
+                <small>{{blog.created}}</small>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 {% endblock %}

@@ -8,6 +8,7 @@ use std::ffi::OsStr;
 use std::fs::{self, File};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
+use templates::LinkLabel;
 use util;
 
 const MD: &'static str = "md";
@@ -139,7 +140,7 @@ impl SiteResource {
         let fullsize_path = build_dir.join(IMAGE_DIR)
             .join(&self.name)
             .with_extension(JPG);
-        let fullsize = image.resize(2560, 1440, FilterType::Triangle);
+        let fullsize = image.resize(1280, 720, FilterType::Triangle);
         info!("Building fullsize photo to {:?}", fullsize_path);
         fullsize.save(&fullsize_path)?;
         Ok(())
@@ -205,10 +206,10 @@ impl SiteResources {
         fs::create_dir_all(build_dir.join(IMAGE_DIR))?;
         fs::create_dir_all(build_dir.join(THUMBNAIL_DIR))?;
         info!("Writing resources into build directory {:?}", build_dir);
-        self.write_resources(build_dir, ignore_changed)?;
         self.write_gallery(build_dir)?;
         self.write_index(build_dir)?;
         self.write_static_templates(build_dir)?;
+        self.write_resources(build_dir, ignore_changed)?;
         Ok(())
     }
 
@@ -224,7 +225,12 @@ impl SiteResources {
         let all_photos = self.resources
             .iter()
             .filter(|r| r.resource_type == ResourceType::Photo)
-            .map(|r| format!("{}/{}.{}", THUMBNAIL_DIR, r.name, JPG))
+            .map(|r| {
+                LinkLabel::new(
+                        format!("{}/{}.{}", THUMBNAIL_DIR, r.name, JPG),
+                        format!("{}/{}.{}", IMAGE_DIR, r.name, JPG),
+                        r.name.clone())
+            })
             .collect::<Vec<_>>();
         let gallery = GalleryTemplate::new(&all_photos[..]);
         let gallery_path = build_dir.join("gallery.html");

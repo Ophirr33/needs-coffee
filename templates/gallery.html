@@ -1,10 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Eventually, photos will go here</h1>
     <div id="photo-gallery">
-        {% for link in preview_links %}
-            <img width=320 height=180 src="{{link}}">
+        {% for label_link in label_links %}
+            <div class="image">
+                <a href="{{label_link.image_link}}">
+                    <img width=320
+                         height=180
+                         src="{{label_link.preview_link}}"
+                         title="{{label_link.label}}">
+                </a>
+            </div>
         {% endfor %}
     </div>
 {% endblock %}

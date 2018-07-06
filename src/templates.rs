@@ -60,20 +60,33 @@ impl<'a> BlogTemplate<'a> {
     }
 }
 
+#[derive(Debug)]
+pub struct LinkLabel {
+    preview_link: String,
+    image_link: String,
+    label: String,
+}
+
+impl LinkLabel {
+    pub fn new(preview_link: String, image_link: String, label: String) -> Self {
+        LinkLabel { preview_link, image_link, label }
+    }
+}
+
 #[derive(Debug, Template)]
 #[template(path = "gallery.html")]
 pub struct GalleryTemplate<'a> {
     _parent: BaseTemplate,
-    preview_links: &'a[String],
+    label_links: &'a[LinkLabel],
 }
 
 
 impl<'a> GalleryTemplate<'a> {
-    pub fn new(preview_links: &'a[String]) -> Self {
+    pub fn new(label_links: &'a[LinkLabel]) -> Self {
         let description = "Just my amateur photos";
         GalleryTemplate {
             _parent: BaseTemplate::new("Ty's Photography", description),
-            preview_links,
+            label_links,
         }
     }
 }

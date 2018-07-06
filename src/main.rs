@@ -126,7 +126,7 @@ fn main() -> Result<(), OpaqueError> {
             Ok(())
         },
         ("serve", Some(_serve_matches)) => {
-            serve(&config, &build_dir, &static_dir)
+            serve(&config, &build_dir, &static_dir, &metadata_file)
         },
         _ => unreachable!()
     }
