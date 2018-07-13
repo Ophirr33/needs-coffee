@@ -37,10 +37,11 @@ use std::fs;
  *       Minify the html files ✓
  *       Compile and output sass styles file ✓
  *       Cleanly refactor
- *       Add caching to each resource
- *       Add a clean command that removes everything in build that isn't in static
+ *       Add caching to each resource ✓
+ *       Add a clean command that removes everything in build that isn't in static ✓
  *       Resize image files to both blog width, preview width, and gallery width ✓
  *       Don't reprocess images if files are already there ✓
+ *       Add a watermark to images
  *       Serve will spin up a simple web server, and define the routes based off of the blogs
  *       directly. Then, just update the blog everytime a file changes.
  * TODO: Add a deploy subcommand that takes care of the scp step
