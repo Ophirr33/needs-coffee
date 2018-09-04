@@ -111,10 +111,10 @@ fn main() -> Result<(), OpaqueError> {
         .unwrap_or(static_dir.join(".meta.toml"));
 
     let config = Config::from_file(&metadata_file).unwrap_or(Config::default());
-    let resources = SiteResources::read_resources(&static_dir, &config)?;
 
     match matches.subcommand() {
         ("build", Some(build_matches)) => {
+            let resources = SiteResources::read_resources(&static_dir, &config)?;
             if build_matches.is_present(arg_clean) {
                 warn!("Cleaning build_dir {:?}", build_dir);
                 fs::remove_dir_all(build_dir)?;

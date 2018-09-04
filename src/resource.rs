@@ -14,6 +14,7 @@ use util;
 const MD: &'static str = "md";
 const SASS: &'static str = "sass";
 const JPG: &'static str = "jpg";
+const JS: &'static str = "js";
 const HTML: &'static str = "html";
 const CSS: &'static str = "css";
 const BLOG_DIR: &'static str = "blog";
@@ -34,6 +35,7 @@ pub enum ResourceType {
     Blog,
     Photo,
     Style,
+    Script
 }
 
 impl ResourceType {
@@ -42,6 +44,7 @@ impl ResourceType {
             MD => Ok(ResourceType::Blog),
             JPG => Ok(ResourceType::Photo),
             SASS => Ok(ResourceType::Style),
+            JS => Ok(ResourceType::Script),
             _ => Err(OpaqueError::new(format!("No resource type for extension {}", ext))),
         }
     }
@@ -58,40 +61,53 @@ pub struct SiteResource {
 
 impl SiteResource {
     fn as_blog(&self) -> Blog {
-        Blog::new(format!("{}/{}.{}", BLOG_DIR, self.name, HTML),
-                  to_sentence_case(&self.name),
-                  format!("{}", self.timing.created))
+        Blog::new(
+            format!("{}/{}.{}", BLOG_DIR, self.name, HTML),
+            to_sentence_case(&self.name),
+            self.timing.created.to_rfc3339())
     }
 
     fn path_exists(&self, build_dir: &Path) -> bool {
         match self.resource_type {
             ResourceType::Blog =>
                 build_dir.join(BLOG_DIR)
-                         .join(&self.name)
-                         .with_extension(HTML)
-                         .exists(),
+                .join(&self.name)
+                .with_extension(HTML)
+                .exists(),
+            ResourceType::Script =>
+                build_dir.join(&self.name)
+                .with_extension(JS)
+                .exists(),
             ResourceType::Style =>
                 build_dir.join(&self.name)
-                         .with_extension(CSS)
-                         .exists(),
+                .with_extension(CSS)
+                .exists(),
             ResourceType::Photo =>
                 build_dir.join(IMAGE_DIR)
-                         .join(&self.name)
-                         .with_extension(JPG)
-                         .exists() &&
+                .join(&self.name)
+                .with_extension(JPG)
+                .exists() &&
                 build_dir.join(THUMBNAIL_DIR)
-                         .join(&self.name)
-                         .with_extension(JPG)
-                         .exists(),
+                .join(&self.name)
+                .with_extension(JPG)
+                .exists(),
         }
     }
 
     fn write_resource(&self, build_dir: &Path) -> OResult<()> {
         match self.resource_type {
             ResourceType::Blog => self.write_blog(build_dir),
+            ResourceType::Script => self.write_script(build_dir),
             ResourceType::Style => self.write_style(build_dir),
             ResourceType::Photo => self.write_photo(build_dir),
         }
+    }
+
+    fn write_script(&self, build_dir: &Path) -> OResult<()> {
+        // todo: minify
+        let js_file = &build_dir.join(&self.name).with_extension(JS);
+        info!("Building script file {} to {:?}", self.name, js_file);
+        util::write_file(js_file, util::read_file(&self.path)?)
     }
 
     fn write_style(&self, build_dir: &Path) -> OResult<()> {
@@ -164,10 +180,13 @@ impl SiteResources {
                 .and_then(OsStr::to_str)
                 .ok_or(OpaqueError::new("No file extension!"))?.to_owned();
 
-            if ![MD, JPG, SASS].contains(&extension.as_ref()) {
-                info!("Skipping file due to unknown extension: {:?}", &path);
-                continue;
-            }
+            let resource_type = match ResourceType::from_extension(&extension) {
+                Err(_) => {
+                    info!("Skipping file due to unknown extension: {:?}", &path);
+                    continue;
+                },
+                Ok(t) => t
+            };
 
             let name = path.file_name()
                 .ok_or(OpaqueError::new("Path ending in ...!"))?
@@ -183,7 +202,6 @@ impl SiteResources {
             let metadata = entry.metadata()?;
             let prev = config.timings.get(&name);
             let timing = Timing::from_metadata_and_prev(&metadata, prev)?;
-            let resource_type = ResourceType::from_extension(&extension)?;
             let changed = prev.map(|prev_timing| prev_timing != &timing).unwrap_or(true);
 
             resources.push(SiteResource { timing, changed, path, name, resource_type })
@@ -227,11 +245,11 @@ impl SiteResources {
             .filter(|r| r.resource_type == ResourceType::Photo)
             .map(|r| {
                 LinkLabel::new(
-                        format!("{}/{}.{}", THUMBNAIL_DIR, r.name, JPG),
-                        format!("{}/{}.{}", IMAGE_DIR, r.name, JPG),
-                        r.name.clone())
+                    format!("{}/{}.{}", THUMBNAIL_DIR, r.name, JPG),
+                    format!("{}/{}.{}", IMAGE_DIR, r.name, JPG),
+                    r.name.clone())
             })
-            .collect::<Vec<_>>();
+        .collect::<Vec<_>>();
         let gallery = GalleryTemplate::new(&all_photos[..]);
         let gallery_path = build_dir.join("gallery.html");
         info!("Writing gallery file to {:?}", gallery_path);

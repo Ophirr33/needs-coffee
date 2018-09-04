@@ -1,16 +1,54 @@
 use askama::Template;
 
+#[derive(Debug, PartialEq)]
+pub enum LinkType {
+    Style,
+    Script
+}
+
+#[derive(Debug)]
+pub struct Link {
+    name: String,
+    link_type: LinkType
+}
+
+impl Link {
+    fn new<S: ToString>(name: S, link_type: LinkType) -> Self {
+        Link { name: name.to_string(), link_type }
+    }
+}
+
+#[derive(Debug)]
+pub struct Meta {
+    name: String,
+    content: String
+}
+
 #[derive(Debug, Template)]
 #[template(path = "base.html")]
 pub struct BaseTemplate {
     title: String,
+    links: Vec<Link>,
+    metas: Vec<Meta>,
     description: String,
 }
 
 impl BaseTemplate {
-    fn new<S1: ToString, S2: ToString>(title: S1, description: S2) -> Self  {
-        BaseTemplate { title: title.to_string(), description: description.to_string() }
+    fn new<S1: ToString, S2: ToString>(
+        title: S1,
+        description: S2,
+        mut links: Vec<Link>,
+        metas: Vec<Meta>) -> Self  {
+        let base_css = Link::new("/styles.css", LinkType::Style);
+        links.push(base_css);
+        BaseTemplate {
+            title: title.to_string(),
+            description: description.to_string(),
+            links,
+            metas
+        }
     }
+
 }
 
 #[derive(Debug)]
@@ -36,8 +74,9 @@ pub struct IndexTemplate<'a> {
 impl<'a> IndexTemplate<'a> {
     pub fn new(blogs: &'a[Blog]) -> Self {
         let description = "Ty Coghlan's personal website and coffee-fueled blog.";
+        let date_script = Link::new("/date_script.js", LinkType::Script);
         IndexTemplate {
-            _parent: BaseTemplate::new("Index", description),
+            _parent: BaseTemplate::new("Index", description, vec![date_script], vec![]),
             blogs: blogs,
         }
     }
@@ -54,7 +93,7 @@ impl<'a> BlogTemplate<'a> {
     pub fn new(blog_html: &'a str, blog: Blog) -> Self {
         let description = "Will make this an actual description eventually";
         BlogTemplate {
-            _parent: BaseTemplate::new(blog.title, description),
+            _parent: BaseTemplate::new(blog.title, description, vec![], vec![]),
             blog_html,
         }
     }
@@ -85,7 +124,7 @@ impl<'a> GalleryTemplate<'a> {
     pub fn new(label_links: &'a[LinkLabel]) -> Self {
         let description = "Just my amateur photos";
         GalleryTemplate {
-            _parent: BaseTemplate::new("Ty's Photography", description),
+            _parent: BaseTemplate::new("Ty's Photography", description, vec![], vec![]),
             label_links,
         }
     }
@@ -101,7 +140,7 @@ impl AboutTemplate {
     pub fn new() -> Self {
         let description = "Ty's bio, relevant links, and coffee preferences.";
         AboutTemplate {
-            _parent: BaseTemplate::new("About Ty", description),
+            _parent: BaseTemplate::new("About Ty", description, vec![], vec![]),
         }
     }
 }
@@ -116,7 +155,7 @@ impl NotFoundTemplate {
     pub fn new() -> Self {
         let description = "404 not found";
         NotFoundTemplate {
-            _parent: BaseTemplate::new("404 not found", description),
+            _parent: BaseTemplate::new("404 not found", description, vec![], vec![]),
         }
     }
 }

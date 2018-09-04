@@ -5,20 +5,20 @@ authors = ["Ty Coghlan <Coghlan.Ty@gmail.com>"]
 
 [dependencies]
 Inflector = "0.11"
-askama = "0.6"
+askama = "0.7"
 chrono = { version = "0.4", features = ["serde"] }
 clap = "2.31"
-html5ever_ext = "0.21"
+html5ever_ext = { git = "https://github.com/ophirr33/html5ever_ext" }
 image = "0.19"
 log = "0.4"
 notify = "4.0"
 pulldown-cmark = { version = "0.1.2", default-features = false }
 rayon = "1.0"
 sass-rs = "0.2"
-serde = "1"
-serde_derive = "1"
+serde = "1.0"
+serde_derive = "1.0"
 simplelog = "0.5"
 toml = "0.4"
 
 [build-dependencies]
-askama = "0.6"
+askama = "0.7"

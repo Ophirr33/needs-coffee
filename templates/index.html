@@ -10,7 +10,7 @@
             {% for blog in blogs %}
             <div class="blog-preview-card">
                 <h3><a href="{{blog.link}}"><h3>{{blog.title}}</a></h3>
-                <small>{{blog.created}}</small>
+                <small class="created-date">{{blog.created}}</small>
             </div>
             {% endfor %}
         </div>

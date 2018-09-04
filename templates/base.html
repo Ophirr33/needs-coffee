@@ -7,7 +7,16 @@
         <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,">
         <meta name="description" content="{{description}}">
         <title>{% block title %}{% endblock %} - ☕</title>
-        <link href="/styles.css" rel="stylesheet">
+        {% for link in links %}
+            {% if link.link_type == LinkType::Style %}
+        <link href="{{link.name}}" rel="stylesheet">
+            {% else if link.link_type == LinkType::Script %}
+        <script src="{{link.name}}"></script>
+            {% endif %}
+        {% endfor %}
+        {% for meta in metas %}
+        <meta property="{{meta.name}}" content="{{meta.content}}">
+        {% endfor %}
     </head>
     <body>
         <div id="content">
