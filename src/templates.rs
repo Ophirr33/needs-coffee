@@ -84,7 +84,7 @@ impl<'a> IndexTemplate<'a> {
         let base = BaseTemplate::new(
             "TY COGHLAN",
             "Software Developer, Coffee Drinker",
-            "Ty Coghlan",
+            "Ty Coghlan | Ty Needs Coffee",
             description,
             vec![date_script],
             vec![]);
@@ -105,10 +105,15 @@ pub struct BlogTemplate<'a> {
 impl<'a> BlogTemplate<'a> {
     pub fn new(blog_html: &'a str, blog: Blog) -> Self {
         let description = "Will make this an actual description eventually";
+        let mut blog_browser_title = blog.title.clone();
+        let suffix = " | Ty Needs Coffee";
+        if blog_browser_title.len() < 70 - suffix.len() {
+            blog_browser_title.push_str(suffix);
+        }
         let base = BaseTemplate::new(
             blog.title.to_uppercase(),
             "By Ty Coghlan".to_owned(),
-            blog.title,
+            blog_browser_title,
             description,
             vec![],
             vec![]);
@@ -146,7 +151,7 @@ impl<'a> GalleryTemplate<'a> {
         let base = BaseTemplate::new(
             "TY COGHLAN",
             "Occasional Photographer",
-            "Ty's Photography", description, vec![], vec![]);
+            "Gallery | Ty Needs Coffee", description, vec![], vec![]);
         GalleryTemplate {
             _parent: base,
             label_links,
@@ -166,7 +171,7 @@ impl AboutTemplate {
         let base = BaseTemplate::new(
             "TY COGHLAN",
             "(No, it's not short for Tyler)",
-            "About Ty",
+            "About | Ty Needs Coffee",
             description,
             vec![],
             vec![]);
@@ -188,7 +193,7 @@ impl NotFoundTemplate {
         let base = BaseTemplate::new(
             "404",
             "Page Not Found",
-            "404",
+            "404 | Ty Needs Coffee",
             description,
             vec![],
             vec![]);
