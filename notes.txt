@@ -1,4 +1,18 @@
-index should be a carded view of blogs
 about page can be a little blurb about me
 anything else will basically try to load a blog
 simple header at the top of every page.
+
+TODOS:
+- Minify JS
+- Handle text
+- Include modified/created date in blogs
+- Watermark images
+- Easy way to include banner images
+- Keyboard navigation
+- OpenGraph / Twitter meta data
+- Accessibility pass
+- Caching of resources
+- Pull styles.sass/date_script.js into binary (include_str)
+- Make compatible rpm/static binary for server deployment
+- Blog meta descriptions
+- Server side metrics

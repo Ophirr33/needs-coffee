@@ -84,7 +84,7 @@ impl<'a> IndexTemplate<'a> {
         let base = BaseTemplate::new(
             "TY COGHLAN",
             "Software Developer, Coffee Drinker",
-            "ty-needs.coffee",
+            "Ty Coghlan",
             description,
             vec![date_script],
             vec![]);
@@ -166,7 +166,7 @@ impl AboutTemplate {
         let base = BaseTemplate::new(
             "TY COGHLAN",
             "(No, it's not short for Tyler)",
-            "About Ty Coghlan",
+            "About Ty",
             description,
             vec![],
             vec![]);
