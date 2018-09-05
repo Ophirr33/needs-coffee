@@ -6,7 +6,7 @@
         <meta name="author" content="Ty Coghlan">
         <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,">
         <meta name="description" content="{{description}}">
-        <title>{% block title %}{% endblock %} - ☕</title>
+        <title>{{browser_title}}</title>
         {% for link in links %}
             {% if link.link_type == LinkType::Style %}
         <link href="{{link.name}}" rel="stylesheet">
@@ -29,8 +29,8 @@
                 </div>
             </div>
             <div id="title">
-                <h1>TY COGHLAN</h1>
-                <p>Software Developer, Coffee Drinker</p>
+                <h1>{{title}}</h1>
+                <p>{{subtitle}}</p>
             </div>
             <div id="body">
                 {% block content %}{% endblock %}
@@ -38,7 +38,9 @@
             <div id="footer">
                 <div class="nav">
                     <p>Made with <a href="https://www.rust-lang.org/en-US/index.html">Rust</a>, fueled by ☕</p>
-                    <p id="copyright">© 2018 Ty Coghlan</p>
+                    <a href="https://creativecommons.org/licenses/by/4.0/" id="copyright">
+                        <p>© 2018 Ty Coghlan</p>
+                    </a>
                 </div>
             </div>
         <div>

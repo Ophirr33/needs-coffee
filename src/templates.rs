@@ -28,6 +28,8 @@ pub struct Meta {
 #[template(path = "base.html")]
 pub struct BaseTemplate {
     title: String,
+    subtitle: String,
+    browser_title: String,
     links: Vec<Link>,
     metas: Vec<Meta>,
     description: String,
@@ -36,6 +38,8 @@ pub struct BaseTemplate {
 impl BaseTemplate {
     fn new<S1: ToString, S2: ToString>(
         title: S1,
+        subtitle: S1,
+        browser_title: S1,
         description: S2,
         mut links: Vec<Link>,
         metas: Vec<Meta>) -> Self  {
@@ -43,6 +47,8 @@ impl BaseTemplate {
         links.push(base_css);
         BaseTemplate {
             title: title.to_string(),
+            subtitle: subtitle.to_string(),
+            browser_title: browser_title.to_string(),
             description: description.to_string(),
             links,
             metas
@@ -75,8 +81,15 @@ impl<'a> IndexTemplate<'a> {
     pub fn new(blogs: &'a[Blog]) -> Self {
         let description = "Ty Coghlan's personal website and coffee-fueled blog.";
         let date_script = Link::new("/date_script.js", LinkType::Script);
+        let base = BaseTemplate::new(
+            "TY COGHLAN",
+            "Software Developer, Coffee Drinker",
+            "ty-needs.coffee",
+            description,
+            vec![date_script],
+            vec![]);
         IndexTemplate {
-            _parent: BaseTemplate::new("Index", description, vec![date_script], vec![]),
+            _parent: base,
             blogs: blogs,
         }
     }
@@ -92,8 +105,15 @@ pub struct BlogTemplate<'a> {
 impl<'a> BlogTemplate<'a> {
     pub fn new(blog_html: &'a str, blog: Blog) -> Self {
         let description = "Will make this an actual description eventually";
+        let base = BaseTemplate::new(
+            blog.title.to_uppercase(),
+            "By Ty Coghlan".to_owned(),
+            blog.title,
+            description,
+            vec![],
+            vec![]);
         BlogTemplate {
-            _parent: BaseTemplate::new(blog.title, description, vec![], vec![]),
+            _parent: base,
             blog_html,
         }
     }
@@ -123,8 +143,12 @@ pub struct GalleryTemplate<'a> {
 impl<'a> GalleryTemplate<'a> {
     pub fn new(label_links: &'a[LinkLabel]) -> Self {
         let description = "Just my amateur photos";
+        let base = BaseTemplate::new(
+            "TY COGHLAN",
+            "Occasional Photographer",
+            "Ty's Photography", description, vec![], vec![]);
         GalleryTemplate {
-            _parent: BaseTemplate::new("Ty's Photography", description, vec![], vec![]),
+            _parent: base,
             label_links,
         }
     }
@@ -139,8 +163,15 @@ pub struct AboutTemplate {
 impl AboutTemplate {
     pub fn new() -> Self {
         let description = "Ty's bio, relevant links, and coffee preferences.";
+        let base = BaseTemplate::new(
+            "TY COGHLAN",
+            "(No, it's not short for Tyler)",
+            "About Ty Coghlan",
+            description,
+            vec![],
+            vec![]);
         AboutTemplate {
-            _parent: BaseTemplate::new("About Ty", description, vec![], vec![]),
+            _parent: base,
         }
     }
 }
@@ -153,9 +184,16 @@ pub struct NotFoundTemplate {
 
 impl NotFoundTemplate {
     pub fn new() -> Self {
-        let description = "404 not found";
+        let description = "404 Page Not Found";
+        let base = BaseTemplate::new(
+            "404",
+            "Page Not Found",
+            "404",
+            description,
+            vec![],
+            vec![]);
         NotFoundTemplate {
-            _parent: BaseTemplate::new("404 not found", description, vec![], vec![]),
+            _parent: base,
         }
     }
 }
