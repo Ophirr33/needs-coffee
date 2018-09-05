@@ -10,8 +10,6 @@
         {% for link in links %}
             {% if link.link_type == LinkType::Style %}
         <link href="{{link.name}}" rel="stylesheet">
-            {% else if link.link_type == LinkType::Script %}
-        <script src="{{link.name}}"></script>
             {% endif %}
         {% endfor %}
         {% for meta in metas %}
@@ -32,17 +30,22 @@
             </div>
             <div id="title">
                 <h1>TY COGHLAN</h1>
-                <p>Software Developer at Disney</p>
+                <p>Software Developer, Coffee Drinker</p>
             </div>
             <div id="body">
                 {% block content %}{% endblock %}
             </div>
             <div id="footer">
                 <div class="nav">
-                    <p>Made with <a href="https://www.rust-lang.org/en-US/index.html">Rust</a> and fueled by ☕</p>
+                    <p>Made with <a href="https://www.rust-lang.org/en-US/index.html">Rust</a>, fueled by ☕</p>
                     <p id="copyright">© 2018 Ty Coghlan</p>
                 </div>
             </div>
         <div>
+        {% for link in links %}
+            {% if link.link_type == LinkType::Script %}
+        <script src="{{link.name}}"></script>
+            {% endif %}
+        {% endfor %}
     </body>
 </html>
