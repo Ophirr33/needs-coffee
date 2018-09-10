@@ -2,19 +2,25 @@
 extern crate askama;
 extern crate clap;
 extern crate chrono;
+#[macro_use]
+extern crate html5ever;
 extern crate html5ever_ext;
 extern crate image;
 extern crate inflector;
+#[macro_use]
+extern crate lazy_static;
 #[macro_use]
 extern crate log;
 extern crate notify;
 extern crate simplelog;
 extern crate pulldown_cmark;
 extern crate rayon;
+extern crate regex;
 extern crate sass_rs;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
+extern crate syntect;
 extern crate toml;
 mod util;
 mod errors;
