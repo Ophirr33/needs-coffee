@@ -9,7 +9,7 @@ askama = "0.7"
 chrono = { version = "0.4", features = ["serde"] }
 clap = "2.31"
 html5ever = "0.22"
-html5ever_ext = { git = "https://github.com/ophirr33/html5ever_ext" }
+html5ever_ext = { git = "https://github.com/ophirr33/html5ever_ext", branch = "code-whitespace-fix" }
 image = "0.19"
 lazy_static = "1.1"
 log = "0.4"

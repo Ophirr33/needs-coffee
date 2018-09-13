@@ -380,7 +380,7 @@ dependencies = [
 [[package]]
 name = "html5ever_ext"
 version = "0.22.0"
-source = "git+https://github.com/ophirr33/html5ever_ext#b6d7d6601a2e82ea6918232d46be9a3b67732ca4"
+source = "git+https://github.com/ophirr33/html5ever_ext?branch=code-whitespace-fix#4f91c12a34fa1d685e8d5299b79bd783f297808c"
 dependencies = [
  "css 0.0.22 (registry+https://github.com/rust-lang/crates.io-index)",
  "either 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1096,7 +1096,7 @@ dependencies = [
  "chrono 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "html5ever 0.22.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "html5ever_ext 0.22.0 (git+https://github.com/ophirr33/html5ever_ext)",
+ "html5ever_ext 0.22.0 (git+https://github.com/ophirr33/html5ever_ext?branch=code-whitespace-fix)",
  "image 0.19.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1474,7 +1474,7 @@ dependencies = [
 "checksum futures 0.1.23 (registry+https://github.com/rust-lang/crates.io-index)" = "884dbe32a6ae4cd7da5c6db9b78114449df9953b8d490c9d7e1b51720b922c62"
 "checksum gif 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff3414b424657317e708489d2857d9575f4403698428b040b609b9d1c1a84a2c"
 "checksum html5ever 0.22.3 (registry+https://github.com/rust-lang/crates.io-index)" = "b04478cf718862650a0bf66acaf8f2f8c906fbc703f35c916c1f4211b069a364"
-"checksum html5ever_ext 0.22.0 (git+https://github.com/ophirr33/html5ever_ext)" = "<none>"
+"checksum html5ever_ext 0.22.0 (git+https://github.com/ophirr33/html5ever_ext?branch=code-whitespace-fix)" = "<none>"
 "checksum image 0.19.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ebdff791af04e30089bde8ad2a632b86af433b40c04db8d70ad4b21487db7a6a"
 "checksum inflate 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "6f53b811ee8e2057ccf9643ca6b4277de90efaf5e61e55fd5254576926bb4245"
 "checksum inotify 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "40b54539f3910d6f84fbf9a643efd6e3aa6e4f001426c0329576128255994718"

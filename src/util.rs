@@ -11,7 +11,8 @@ use html5ever::rcdom::{RcDom, Node, NodeData, Handle};
 use html5ever::LocalName;
 use html5ever::interface::QualName;
 use html5ever::tree_builder::Attribute;
-use html5ever_ext::{RcDomExt, Minify};
+use html5ever_ext::RcDomExt;
+use html5ever_ext::UltraMinifyingHtmlSerializer;
 use regex::Regex;
 
 pub fn read_file<P: AsRef<Path>>(path: P) -> OResult<String> {
@@ -26,9 +27,12 @@ pub fn write_minified_html<P, B>(path: P, content: B) -> OResult<()>
 where P: AsRef<Path>,
       B: AsRef<[u8]>
 {
+    let f = File::create(path)?;
+    let bw = BufWriter::new(f);
     let mut dom = RcDom::from_bytes(content.as_ref());
     inspect_dom(&mut dom);
-    dom.minify_to_file_path(false, path)?;
+    let mut mini = UltraMinifyingHtmlSerializer::new(false, true, false, bw);
+    mini.serialize_rc_dom(&dom, false)?;
     Ok(())
 }
 
@@ -56,9 +60,9 @@ fn inspect_node(node: &mut Handle) {
     if let NodeData::Element { ref name, ref attrs, .. } = node.data {
         if &name.local == "code" {
             if let Some(attr) =  attrs.borrow().iter().find(|attr| &attr.name.local == "class") {
-                if let Some(ref language_match) = RE.find(&*attr.value) {
+                if let Some(ref language_match) = RE.captures(&*attr.value) {
                     let new = text_to_highlighted(
-                        language_match.as_str(),
+                        language_match.get(1).unwrap().as_str(),
                         &node.children.borrow()
                     );
                     node.children.replace(new);
@@ -85,29 +89,38 @@ fn text_to_highlighted(language: &str, children: &[Handle]) -> Vec<Handle> {
 }
 
 fn highlight_code(language: &str, code: &str, parent: Handle) -> Vec<Handle> {
-    let ss = SyntaxSet::load_defaults_nonewlines();
+    let ss = SyntaxSet::load_defaults_newlines();
     let ts = ThemeSet::load_defaults();
     let syntax = ss.find_syntax_by_token(language)
         .unwrap_or(ss.find_syntax_plain_text());
     let mut h = HighlightLines::new(syntax, &ts.themes["base16-ocean.dark"]);
     let mut children: Vec<Handle> = Vec::new();
-    for ranges in code.lines().map(|line| h.highlight(line)) {
-        for (style, text) in ranges {
-            children.push(style_to_node(style, text, parent.clone()))
+    for line in code.lines() {
+        let ranges = h.highlight(line);
+        for &(style, text) in ranges.iter() {
+            if text.trim().is_empty() {
+                children.push(text_to_node(text, parent.clone()));
+            } else {
+                children.push(style_to_node(style, text, parent.clone()))
+            }
         }
+        children.push(text_to_node("\n", parent.clone()));
     }
     children
 }
 
-fn style_to_node(style: Style, text: &str, parent: Handle) -> Handle {
-    let parent = Cell::new(Some(Rc::downgrade(&parent)));
-    let text = Rc::new(Node {
-        parent: Cell::new(None),
+fn text_to_node(text: &str, parent: Handle) -> Handle {
+    Rc::new(Node {
+        parent: Cell::new(Some(Rc::downgrade(&parent))),
         children: RefCell::new(vec![]),
         data: NodeData::Text {
             contents: RefCell::new(text.to_owned().into())
         }
-    });
+    })
+}
+
+fn style_to_node(style: Style, text: &str, parent: Handle) -> Handle {
+    let parent = Cell::new(Some(Rc::downgrade(&parent)));
     let style = Attribute {
         name: QualName { prefix: None, ns: ns!(), local: LocalName::from("style") },
         value: style_to_attr(style).into()
@@ -122,10 +135,8 @@ fn style_to_node(style: Style, text: &str, parent: Handle) -> Handle {
         template_contents: None,
         mathml_annotation_xml_integration_point: false,
     };
-    let res = Rc::new(Node { parent, data, children: RefCell::new(vec![text.clone()]) });
-    let cloned = res.clone();
-    let parent_pointer = Some(Rc::downgrade(&cloned));
-    text.parent.replace(parent_pointer);
+    let res = Rc::new(Node { parent, data, children: RefCell::new(Vec::new()) });
+    res.children.borrow_mut().push(text_to_node(text, res.clone()));
     res
 }
 
