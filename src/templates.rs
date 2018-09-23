@@ -40,6 +40,10 @@ impl Meta {
         Meta::new("og:title", title)
     }
 
+    fn og_image(image: &str) -> Self {
+        Meta::new("og:image", image)
+    }
+
     fn og_type(r#type: &str) -> Self {
         Meta::new("og:type", r#type)
     }
@@ -80,6 +84,7 @@ impl BaseTemplate {
         ];
         let mut common_meta = vec![
             Meta::og_site_name(),
+            Meta::og_image("https://ty-needs.coffee/image/coffee.jpg"),
         ];
         links.append(&mut base_links);
         metas.append(&mut common_meta);
