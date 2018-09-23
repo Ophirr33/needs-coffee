@@ -41,5 +41,6 @@ opaque_error!(image::ImageError);
 opaque_error!(simplelog::TermLogError);
 opaque_error!(notify::Error);
 opaque_error!(mpsc::RecvError);
+opaque_error!(std::string::FromUtf8Error);
 
 pub type OResult<T> = Result<T, OpaqueError>;

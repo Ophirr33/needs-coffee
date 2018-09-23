@@ -9,7 +9,9 @@
         <title>{{browser_title}}</title>
         {% for link in links %}
             {% if link.link_type == LinkType::Style %}
-        <link href="{{link.name}}" rel="stylesheet">
+        <link href="{{link.name}}?v=1.0" rel="stylesheet">
+            {% else if link.link_type == LinkType::Icon %}
+        <link rel="icon" type="image/x-icon" href="{{link.name}}">
             {% endif %}
         {% endfor %}
         {% for meta in metas %}
@@ -46,7 +48,7 @@
         </div>
         {% for link in links %}
             {% if link.link_type == LinkType::Script %}
-        <script src="{{link.name}}"></script>
+        <script src="{{link.name}}?v=1.0"></script>
             {% endif %}
         {% endfor %}
     </body>

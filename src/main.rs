@@ -1,41 +1,39 @@
 #[macro_use]
 extern crate askama;
-extern crate clap;
 extern crate chrono;
+extern crate clap;
 #[macro_use]
 extern crate html5ever;
 extern crate html5ever_ext;
 extern crate image;
 extern crate inflector;
 #[macro_use]
-extern crate lazy_static;
-#[macro_use]
 extern crate log;
 extern crate notify;
-extern crate simplelog;
 extern crate pulldown_cmark;
 extern crate rayon;
 extern crate regex;
 extern crate sass_rs;
+extern crate simplelog;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
 extern crate syntect;
 extern crate toml;
-mod util;
-mod errors;
 mod config;
-mod templates;
+mod errors;
 mod resource;
 mod serve;
+mod templates;
+mod util;
 
 use clap::{App, Arg, SubCommand};
 use config::*;
 use errors::*;
 use resource::SiteResources;
 use serve::serve;
-use std::path::{Path, PathBuf};
 use std::fs;
+use std::path::{Path, PathBuf};
 
 /* TODO: Add build and serve functions, () -> Result<(), OpaqueError>, and call them in the
  *       subcomand matches
@@ -54,65 +52,75 @@ use std::fs;
  */
 
 fn main() -> Result<(), OpaqueError> {
-    simplelog::TermLogger::init(simplelog::LevelFilter::Info,
-                                simplelog::Config::default())?;
-    let arg_build    = "BUILD_DIR";
-    let arg_cache    = "NO_CACHE";
-    let arg_clean    = "CLEAN";
-    let arg_listen   = "LISTEN_ADDR";
+    simplelog::TermLogger::init(simplelog::LevelFilter::Info, simplelog::Config::default())?;
+    let arg_build = "BUILD_DIR";
+    let arg_cache = "NO_CACHE";
+    let arg_clean = "CLEAN";
+    let arg_listen = "LISTEN_ADDR";
     let arg_metadata = "METADATA_FILE";
-    let arg_static   = "STATIC_DIR";
-    let mut app =
-        App::new("static-site-generator")
-            .version("1.0")
-            .author("Ty Coghlan <coghlan.ty@gmail.com>")
-            .about("Incredibly simple site generator")
-            .arg(Arg::with_name(arg_static)
-                     .long("static")
-                     .help("The static site directory")
-                     .takes_value(true)
-                     .global(true))
-            .arg(Arg::with_name(arg_metadata)
-                     .long("metadata")
-                     .help("The location of the metadata file (stores time info)")
-                     .takes_value(true)
-                     .global(true))
-            .arg(Arg::with_name(arg_build)
-                     .index(1)
-                     .help("The output directory")
-                     .takes_value(true))
-            .subcommand(SubCommand::with_name("build")
-                            .about("Builds published site files")
-                            .arg(Arg::with_name(arg_clean)
-                                     .long("clean")
-                                     .help("removes the build directory")
-                                     .takes_value(false))
-                            .arg(Arg::with_name(arg_cache)
-                                     .long("no-cache")
-                                     .help("rebuilds all files regardless of timing")
-                                     .takes_value(false)))
-            .subcommand(SubCommand::with_name("serve")
-                            .about("Just serves a hot reload server")
-                            .arg(Arg::with_name(arg_listen)
-                                     .index(1)
-                                     .help("The address and port to listen on")
-                                     .takes_value(true)));
+    let arg_static = "STATIC_DIR";
+    let mut app = App::new("static-site-generator")
+        .version("1.0")
+        .author("Ty Coghlan <coghlan.ty@gmail.com>")
+        .about("Incredibly simple site generator")
+        .arg(
+            Arg::with_name(arg_static)
+                .long("static")
+                .help("The static site directory")
+                .takes_value(true)
+                .global(true),
+        ).arg(
+            Arg::with_name(arg_metadata)
+                .long("metadata")
+                .help("The location of the metadata file (stores time info)")
+                .takes_value(true)
+                .global(true),
+        ).arg(
+            Arg::with_name(arg_build)
+                .index(1)
+                .help("The output directory")
+                .takes_value(true),
+        ).subcommand(
+            SubCommand::with_name("build")
+                .about("Builds published site files")
+                .arg(
+                    Arg::with_name(arg_clean)
+                        .long("clean")
+                        .help("removes the build directory")
+                        .takes_value(false),
+                ).arg(
+                    Arg::with_name(arg_cache)
+                        .long("no-cache")
+                        .help("rebuilds all files regardless of timing")
+                        .takes_value(false),
+                ),
+        ).subcommand(
+            SubCommand::with_name("serve")
+                .about("Just serves a hot reload server")
+                .arg(
+                    Arg::with_name(arg_listen)
+                        .index(1)
+                        .help("The address and port to listen on")
+                        .takes_value(true),
+                ),
+        );
     let matches = app.clone().get_matches();
 
     match matches.subcommand() {
-        ("build", Some(_build_matches)) => { },
-        ("serve", Some(_serve_matches)) => { },
+        ("build", Some(_build_matches)) => {}
+        ("serve", Some(_serve_matches)) => {}
         _ => {
             app.print_help()?;
             println!();
             return Ok(());
-        },
+        }
     };
 
     let static_dir = Path::new(matches.value_of(arg_static).unwrap_or("static"));
     let build_dir = Path::new(matches.value_of(arg_build).unwrap_or("build"));
 
-    let metadata_file = matches.value_of(arg_metadata)
+    let metadata_file = matches
+        .value_of(arg_metadata)
         .map(|s| PathBuf::from(s))
         .unwrap_or(static_dir.join(".meta.toml"));
 
@@ -131,10 +139,8 @@ fn main() -> Result<(), OpaqueError> {
                 updated_config.to_file(&metadata_file)?;
             }
             Ok(())
-        },
-        ("serve", Some(_serve_matches)) => {
-            serve(&config, &build_dir, &static_dir, &metadata_file)
-        },
-        _ => unreachable!()
+        }
+        ("serve", Some(_serve_matches)) => serve(&config, &build_dir, &static_dir, &metadata_file),
+        _ => unreachable!(),
     }
 }
